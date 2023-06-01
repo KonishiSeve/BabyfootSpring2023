@@ -4,8 +4,9 @@ import numpy as np
 
 #linear speed in mm
 speed = 800
-path_high_res = "C:/Users/sevek/Desktop/BabyfootSpring2023/LinearTest/Cam5_800"
-path_low_res = "C:/Users/sevek/Desktop/BabyfootSpring2023/LinearTest/Cam0_800"
+graph_title = "{0}mm/s".format(speed)
+path_high_res = "C:/Users/sevek/Desktop/BabyfootSpring2023/LinearTest/Cam5_{0}".format(speed)
+path_low_res = "C:/Users/sevek/Desktop/BabyfootSpring2023/LinearTest/Cam0_{0}".format(speed)
 
 #reads a file and puts the data in a dictionnary
 def read_file(path,discard_zeros=True):
@@ -58,12 +59,12 @@ if __name__ == "__main__":
     data_high, counter = read_file(path_high_res)
     data_low, counter = read_file(path_low_res)
 
-    data_size = int(min(len(data_high["ts"]),len(data_low["ts"]))-400000/speed)
+    data_size = int(300000/speed)#int(min(len(data_high["ts"]),len(data_low["ts"]))-400000/speed)
     print("Data size: " + str(data_size))
 
     data_high = sinc_data(data_high,speed,data_size)
     data_low = sinc_data(data_low,speed,data_size)
-    y_control = make_data(data_low["ts"],speed)
+    y_control = make_data(data_low["ts"][:],speed)
 
     error_low = abs(np.array(y_control)-np.array(data_low["y"]))
     print("\n===== LOW RES ===== \nerror mean: {0}".format(np.mean(error_low)))
@@ -76,8 +77,12 @@ if __name__ == "__main__":
     print("error std: {0}\n".format(np.std(error_high)))
 
     fig, ax = plt.subplots()
-    ax.plot(data_low["ts"],data_low["y"], label="cam0")
-    ax.plot(data_low["ts"],data_high["y"], label="cam5")
-    ax.plot(data_low["ts"],y_control, label="command")
+    time_axis = [i-data_low["ts"][0] for i in data_low["ts"]]
+    ax.plot(time_axis, data_low["y"], label="cam0")
+    ax.plot(time_axis, data_high["y"], label="cam5")
+    ax.plot(time_axis, y_control, label="command")
+    ax.set_xlabel("time [s]")
+    ax.set_ylabel("position [mm]")
+    ax.set_title(graph_title)
     ax.legend()
     plt.show()
