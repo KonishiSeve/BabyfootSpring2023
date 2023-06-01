@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #linear speed in mm
-speed = 400
-path_high_res = ""
-path_low_res = ""
+speed = 800
+path_high_res = "C:/Users/sevek/Desktop/BabyfootSpring2023/LinearTest/Cam5_800"
+path_low_res = "C:/Users/sevek/Desktop/BabyfootSpring2023/LinearTest/Cam0_800"
 
 #reads a file and puts the data in a dictionnary
 def read_file(path,discard_zeros=True):
