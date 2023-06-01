@@ -138,7 +138,7 @@ def btn_file_handle(): #to open a file
             counter += 1
         flag_start = True
     print(counter)
-    prediction_custom()
+    #prediction_custom()
     scale_start.config(to=len(Ball_Ts)-1)
     scale_select.config(to=len(Ball_Ts)-1)
     scale_select.set(0)
@@ -149,6 +149,8 @@ def btn_file_handle(): #to open a file
     flag_render_select = True
 
 def scale_handle(event):
+    if scale_start.get() >= scale_end.get():
+        scale_start.set(scale_end.get()-1)
     scale_select.config( from_=scale_start.get(), to=scale_end.get())
     global flag_render_traj
     global flag_render_select
@@ -211,7 +213,7 @@ def update():
             #plot ball
             canvas_pts.append(canvas_scatter(canvas, Ball_X[select], Ball_Y[select], size=6,color="orange"))
             canvas_pts.append(canvas_arrow(canvas, Ball_X[select], Ball_Y[select], Ball_X[select]+Ball_Vx[select]/10, Ball_Y[select]+Ball_Vy[select]/10))
-            if plot_ypred.get():
+            if plot_players.get():
                 #forward
                 color = "#B4E61E"
                 if Ypred_forward[select] != 0:
@@ -241,6 +243,13 @@ def update():
                 color = "#B4E61E"
                 if Ypred_goalkeeper[select] != 0:
                     color = "#1EE65A"
+                canvas_pts.append(canvas_scatter(canvas, -525, Ypred_goalkeeper[select], color=color))
+
+            if plot_rodcenter.get():
+                color = "#F080F0"
+                canvas_pts.append(canvas_scatter(canvas, 225, Ypred_forward[select], color=color))
+                canvas_pts.append(canvas_scatter(canvas, -75, Ypred_midfields[select], color=color))
+                canvas_pts.append(canvas_scatter(canvas, -375, Ypred_defenders[select], color=color))
                 canvas_pts.append(canvas_scatter(canvas, -525, Ypred_goalkeeper[select], color=color))
             
             #update the label
@@ -293,10 +302,10 @@ def update():
             text += u"\u0394X mid     : {0}mm\n\n".format(e_mid)
 
             text += u"\u0394T defender: {0}s\n".format(t_def)
-            text += u"\u0394T defender: {0}mm\n\n".format(e_def)
+            text += u"\u0394X defender: {0}mm\n\n".format(e_def)
 
             text += u"\u0394T goal    : {0}s\n".format(t_goal)
-            text += u"\u0394T goal    : {0}mm\n\n".format(e_goal)
+            text += u"\u0394X goal    : {0}mm\n\n".format(e_goal)
 
             lbl_data.config(text=text)
 
@@ -327,13 +336,13 @@ lbl_filename.grid(row=0, column=0)
 button_file = tk.Button(frame_left, text="open file", command=btn_file_handle)
 button_file.grid(row=1, column=0)
 
-plot_ypred = tk.IntVar()
-check_Ypred = tk.Checkbutton(frame_left, text='Plot Ypred', variable=plot_ypred, command=render_pts_handle)
-check_Ypred.grid(row=2, column=0, sticky="W")
+plot_players = tk.IntVar()
+check_players = tk.Checkbutton(frame_left, text='Plot Players', variable=plot_players, command=render_pts_handle)
+check_players.grid(row=2, column=0, sticky="W")
 
-plot_speedpred = tk.IntVar()
-check_SpeedPred = tk.Checkbutton(frame_left, text='Plot Speed Pred', variable=plot_speedpred)
-check_SpeedPred.grid(row=3, column=0, sticky="W")
+plot_rodcenter = tk.IntVar()
+check_rodcenter = tk.Checkbutton(frame_left, text='Plot Rod center', variable=plot_rodcenter, command=render_pts_handle)
+check_rodcenter.grid(row=3, column=0, sticky="W")
 
 lbl_data = tk.Label(frame_left, text="data:", anchor="w", justify=tk.LEFT, font=('Courier', 10))
 lbl_data.grid(row=4, column=0, sticky="W")

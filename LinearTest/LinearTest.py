@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 #linear speed in mm
-speed = 800
+speed = 50
 graph_title = "{0}mm/s".format(speed)
 path_high_res = "C:/Users/sevek/Desktop/BabyfootSpring2023/LinearTest/Cam5_{0}".format(speed)
 path_low_res = "C:/Users/sevek/Desktop/BabyfootSpring2023/LinearTest/Cam0_{0}".format(speed)
