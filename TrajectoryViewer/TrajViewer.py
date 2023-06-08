@@ -12,6 +12,41 @@ import numpy as np
 import csv
 import time
 
+#Global variables
+Ball_Ts = []
+Ball_X = []
+Ball_Y = []
+Ypred_forward = []
+Ypred_midfields = []
+Ypred_defenders = []
+Ypred_goalkeeper = []
+Ball_Vx = []
+Ball_Vy = []
+
+# === you can change the for loop to fill y_pred_... with your custom prediction method ===
+#You can use the variables above as input for the prediction
+#This example uses the mean of the last 30 speeds to compute a slope
+
+use_custom_pred = True #change this to false to keep what was already in Ypred
+def prediction_custom():
+    global Ypred_forward
+    global Ypred_midfields
+    global Ypred_defenders
+    global Ypred_goalkeeper
+    for i in range(30,len(Ball_Ts)):
+        if sum(Ball_Vx[i-30:i]) != 0:
+            a = sum(Ball_Vy[i-30:i])/sum(Ball_Vx[i-30:i])
+            b = Ball_Y[i] - Ball_X[i]*a
+            Ypred_goalkeeper[i] = -525*a + b
+            Ypred_defenders[i] = -375*a + b
+            Ypred_midfields[i] = -75*a + b
+            Ypred_forward[i] = 225*a + b
+        else:
+            Ypred_goalkeeper[i] = 0
+            Ypred_defenders[i] = 0
+            Ypred_midfields[i] = 0
+            Ypred_forward[i] = 0
+
 #Canvas size
 w = 1080
 h = int(w*3.0/4.0)
@@ -23,17 +58,6 @@ flag_render_select = False
 canvas_traj = [] #handles for the selected traj lines
 canvas_pts = [] #handles for the points
 canvas_background = None #image of the whole plot
-
-#Global variables
-Ball_Ts = []
-Ball_X = []
-Ball_Y = []
-Ypred_forward = []
-Ypred_midfields = []
-Ypred_defenders = []
-Ypred_goalkeeper = []
-Ball_Vx = []
-Ball_Vy = []
 
 #Misc functions
 def mm2pix(coord):
@@ -72,25 +96,6 @@ def image_plot(x, y, subsampling=1, color="black"):
 
     canvas_background = ImageTk.PhotoImage(image=image)
     canvas.create_image(0,0,image=canvas_background ,anchor='nw')
-
-def prediction_custom():
-    global Ypred_forward
-    global Ypred_midfields
-    global Ypred_defenders
-    global Ypred_goalkeeper
-    for i in range(30,len(Ball_Ts)):
-        if sum(Ball_Vx[i-30:i]) != 0:
-            a = sum(Ball_Vy[i-30:i])/sum(Ball_Vx[i-30:i])
-            b = Ball_Y[i] - Ball_X[i]*a
-            Ypred_goalkeeper[i] = -525*a + b
-            Ypred_defenders[i] = -375*a + b
-            Ypred_midfields[i] = -75*a + b
-            Ypred_forward[i] = 225*a + b
-        else:
-            Ypred_goalkeeper[i] = 0
-            Ypred_defenders[i] = 0
-            Ypred_midfields[i] = 0
-            Ypred_forward[i] = 0
 
 #gui functions
 def btn_file_handle(): #to open a file
@@ -138,7 +143,8 @@ def btn_file_handle(): #to open a file
             counter += 1
         flag_start = True
     print(counter)
-    #prediction_custom()
+    if use_custom_pred:
+        prediction_custom()
     scale_start.config(to=len(Ball_Ts)-1)
     scale_select.config(to=len(Ball_Ts)-1)
     scale_select.set(0)
@@ -316,7 +322,7 @@ def update():
 
 #GUI definition
 root = tk.Tk()
-
+root.title("Trajectory Viewer by Severin Konishi")
 frame_left = tk.Frame(root)
 frame_right = tk.Frame(root)
 frame_bottom = tk.Frame(root)
